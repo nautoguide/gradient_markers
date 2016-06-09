@@ -29,10 +29,10 @@ BEGIN
 			gradient := Round(dy/dx, 2) * 100;
 			azimuth := ST_Azimuth(r.geom,previous_point)* 180 / pi();
 
-			CASE WHEN  ABS(dy/dx) >= double_chevron_param THEN
+			CASE WHEN  ABS(dy/dx) >= double_chevron_param AND dx > 30 THEN
 				chevron_type := 'double';
 				RETURN NEXT;
-			     WHEN ABS(dy/dx) >= single_chevron_param THEN
+			     WHEN ABS(dy/dx) >= single_chevron_param AND dx > 30 THEN
 				chevron_type := 'single';
 				RETURN NEXT;
 			ELSE
@@ -42,8 +42,4 @@ BEGIN
 	END LOOP;
 END;
 $BODY$
-  LANGUAGE plpgsql VOLATILE
-  COST 100
-  ROWS 1000;
-ALTER FUNCTION ng_research.gradient_finder(geometry, double precision, double precision)
-  OWNER TO postgres;
+  LANGUAGE plpgsql;

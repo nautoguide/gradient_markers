@@ -1,7 +1,5 @@
 -- Function: ng_research.add_height_to_line(geometry, text, integer)
 
--- DROP FUNCTION ng_research.add_height_to_line(geometry, text, integer);
-
 CREATE OR REPLACE FUNCTION ng_research.add_height_to_line(
     geometry_param geometry,
     dem_table_param text,
