@@ -1,11 +1,12 @@
--- Function: ng_research.gradient_finder(geometry, double precision, double precision)
+-- Function: ng_research.gradient_finder(geometry, double precision, double precision, integer)
 
--- DROP FUNCTION ng_research.gradient_finder(geometry, double precision, double precision);
+-- DROP FUNCTION ng_research.gradient_finder(geometry, double precision, double precision, integer);
 
 CREATE OR REPLACE FUNCTION ng_research.gradient_finder(
     IN geometry_param geometry,
     IN single_chevron_param double precision DEFAULT 0.14,
-    IN double_chevron_param double precision DEFAULT 0.20)
+    IN double_chevron_param double precision DEFAULT 0.20,
+    IN min_length integer DEFAULT 50)
   RETURNS TABLE(wkb_geometry geometry, gradient double precision, azimuth double precision, chevron_type character varying) AS
 $BODY$
 DECLARE
@@ -26,13 +27,13 @@ BEGIN
 			dx := ST_Distance(previous_point,r.geom);
 			dy := ST_Z(r.geom) - ST_Z(previous_point);
 			wkb_geometry := r.geom;
-			gradient := Round(dy/dx, 2) * 100;
+			gradient := Round(dy/dx, 4) * 100;
 			azimuth := ST_Azimuth(r.geom,previous_point)* 180 / pi();
 
-			CASE WHEN  ABS(dy/dx) >= double_chevron_param AND dx > 30 THEN
+			CASE WHEN  ABS(dy/dx) >= double_chevron_param AND dx > min_length THEN
 				chevron_type := 'double';
 				RETURN NEXT;
-			     WHEN ABS(dy/dx) >= single_chevron_param AND dx > 30 THEN
+			     WHEN ABS(dy/dx) >= single_chevron_param AND dx > min_length THEN
 				chevron_type := 'single';
 				RETURN NEXT;
 			ELSE

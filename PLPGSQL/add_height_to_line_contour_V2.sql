@@ -14,6 +14,7 @@ BEGIN
 
 	EXECUTE $SQL$
 	  WITH CTE AS (
+	    --Points of intersection
 		SELECT (ST_Dump(ST_Intersection($1,c1.wkb_geometry))).geom as geometry,
 			$SQL$||elevation_field||$SQL$ AS prop_value
 		FROM $SQL$||contour_table||$SQL$ C1
@@ -22,15 +23,17 @@ BEGIN
 	  ), Z_POINTS AS (
 
 	  SELECT * FROM(
+	        --points of intersection
 			SELECT ST_SETSRID(ST_MAKEPOINT(ST_X(geometry),ST_Y(geometry), prop_value),ST_SRID($1)) as point FROM CTE
 			UNION
+			--interpolated height points
 			SELECT ST_SETSRID(ng_research.contour_interpolate((ST_DUMPPOINTS($1)).geom,$2),ST_SRID($1),elevation_field) as point
 			) FOO
+	  --make sure we put line back together in right order
 	  ORDER BY ST_LINELOCATEPOINT(ST_LIneMerge($1),point) ASC
 
 	  )
 	  SELECT  ST_Makeline(point) as wkb_geometry  FROM Z_POINTS
-	  --ORDER BY ST_LINELOCATEPOINT(ST_LIneMerge($1),point) ASC
 	  	$SQL$
       		INTO geometry_ret_var
 		USING ST_TRANSFORM(geometry_param,27700),contour_table;
