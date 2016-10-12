@@ -10,6 +10,8 @@ DECLARE
 	resampled_line_var geometry;
 BEGIN
 
+--Resample the line to get a point ever N metres, note well our assumption is EPSG 27700
+
 EXECUTE $SQL$
 	WITH measured_line AS (
 
@@ -30,7 +32,7 @@ EXECUTE $SQL$
 	)
 	SELECT ST_MakeLine(point_geometry) FROM points_2d 
 	$SQL$ INTO resampled_line_var 
-	USING geometry_param, resample_distance;
+	USING ST_TRANSFORM(geometry_param,27700), resample_distance;
 	
 
 

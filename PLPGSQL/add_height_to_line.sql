@@ -25,7 +25,7 @@ EXECUTE
 	         ST_Length($1) as i
 
 	), points_2d AS (
-        --Create a set of points
+        --Create a set of points, transform to 4326 to match our DEM
 		SELECT ST_Transform(ST_GeometryN(ST_LocateAlong(lm_geom,i),1),4326) AS point_geometry
 		FROM measured_line ORDER BY i ASC
 
@@ -38,7 +38,7 @@ EXECUTE
 		WHERE ST_Intersects(rast,  point_geometry)
 
 	), points_3d AS (
-        --Construct 3D points
+        --Construct 3D points, transform back to original SRID
 		SELECT ST_TRANSFORM(ST_SETSRID(ST_MakePoint(ST_X(point_geometry), ST_Y(point_geometry),height),4326),ST_SRID($1)) as point_geometry_3d
 		FROM dem_points
 	)

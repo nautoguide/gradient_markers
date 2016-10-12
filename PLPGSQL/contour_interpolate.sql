@@ -13,12 +13,14 @@ DECLARE
 BEGIN
 	EXECUTE $SQL$
 
+        --Interpolate the height based upon the distance of point from closest contour
 		SELECT ST_Makepoint(
 				    ST_X($1),
 				    ST_Y($1),
 				    ROUND((lag(elevation) over () + (elevation - lag(elevation) over() )  * (lag(distance) over() / (distance + lag(distance) over())))::NUMERIC,2)
 				    )
 		FROM (
+		    --Find 2 closest contours to the point and distance from point to contour
 			SELECT
 				$SQL$||elevation_field_param||$SQL$ AS elevation,
 				ST_Distance($1,wkb_geometry) as distance
