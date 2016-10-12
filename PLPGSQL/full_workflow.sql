@@ -1,6 +1,6 @@
 --ADD Z Values to road network
 DROP TABLE IF EXISTS ng_research.su_roads_3d;
-SELECT id,ng_research.add_height_to_line_contour_v2(wkb_geometry, 'ng_research.terrain_50_contour', 'prop_value') as wkb_geometry INTO ng_research.su_roads_3d
+SELECT id,ng_research.add_height_to_line_contour_v3(wkb_geometry, 'ng_research.terrain_50_contour', 'prop_value') as wkb_geometry INTO ng_research.su_roads_3d
 FROM ng_research.su_roads
 WHERE wkb_geometry && 'BOX(405677 176736,408207 178054)'::BOX2D;
 
