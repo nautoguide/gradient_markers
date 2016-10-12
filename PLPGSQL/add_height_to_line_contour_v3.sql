@@ -37,17 +37,10 @@ EXECUTE $SQL$
 
 
 EXECUTE $SQL$
-	  WITH CTE AS (
-		SELECT (ST_Dump(ST_Intersection($1,c1.wkb_geometry))).geom as geometry,
-			$SQL$||elevation_field||$SQL$ AS prop_value
-		FROM $SQL$||contour_table||$SQL$ C1
-		WHERE  ST_INTERSECTS($1, C1.wkb_geometry)
-
-	  ), Z_POINTS AS (
+	  WITH  Z_POINTS AS (
 
 	  SELECT * FROM(
-			--SELECT ST_SETSRID(ST_MAKEPOINT(ST_X(geometry),ST_Y(geometry), prop_value),ST_SRID($1)) as point FROM CTE
-			--UNION 
+			 
 			SELECT ST_SETSRID(ng_research.contour_interpolate((ST_DUMPPOINTS($1)).geom,$2,$3),ST_SRID($1)) as point
 			) FOO
 	  ORDER BY ST_LINELOCATEPOINT(ST_LIneMerge($1),point) ASC
